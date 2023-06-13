@@ -1,0 +1,40 @@
+{
+    "name": "yii1tech/web-user",
+    "description": "Provides advanced web user component for Yii1",
+    "keywords": ["yii1", "web", "user", "auth", "event", "model"],
+    "license": "BSD-3-Clause",
+    "support": {
+        "issues": "https://github.com/yii1tech/web-user/issues",
+        "wiki": "https://github.com/yii1tech/web-user/wiki",
+        "source": "https://github.com/yii1tech/web-user"
+    },
+    "authors": [
+        {
+            "name": "Paul Klimov",
+            "email": "klimov.paul@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.1",
+        "yiisoft/yii": "~1.1.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.0 || ^7.0 || ^8.0 || ^9.3 || ^10.0.7",
+        "yii1tech/session-dummy": "^1.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "yii1tech\\web\\user\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "yii1tech\\web\\user\\test\\": "tests"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
+}
