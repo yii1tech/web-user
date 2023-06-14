@@ -6,13 +6,27 @@ use CEvent;
 use CWebUser;
 
 /**
- * WebUser extends the standard Yii class {@see \CWebUser}, providing handlers for the following events:
+ * WebUser extends the standard Yii class {@see \CWebUser}, providing handlers for the authentication flow events.
  *
- * - {@see onAfterRestore} - raises after user data restoration;
- * - {@see onBeforeLogin} - raises before user logs in;
- * - {@see onAfterLogin} - raises after user successfully logged in;
- * - {@see onBeforeLogout} - raises before user logs out;
- * - {@see onAfterLogout} - raises after user successfully logged out;
+ * Application configuration example:
+ *
+ * ```php
+ * return [
+ *     'components' => [
+ *         'user' => [
+ *             'class' => yii1tech\web\user\WebUser::class,
+ *         ],
+ *         // ...
+ *     ],
+ *     // ...
+ * ];
+ * ```
+ *
+ * @property callable|\CList $onAfterRestore raises after user data restoration.
+ * @property callable|\CList $onBeforeLogin raises before user logs in.
+ * @property callable|\CList $onAfterLogin raises after user successfully logged in.
+ * @property callable|\CList $onBeforeLogout raises before user logs out.
+ * @property callable|\CList $onAfterLogout raises after user successfully logged out.
  *
  * @author Paul Klimov <klimov.paul@gmail.com>
  * @since 1.0
@@ -26,7 +40,9 @@ class WebUser extends CWebUser
     {
         parent::init();
 
-        $this->afterRestore();
+        if (!$this->getIsGuest()) {
+            $this->afterRestore();
+        }
     }
 
     /**
@@ -58,18 +74,19 @@ class WebUser extends CWebUser
      */
     protected function beforeLogin($id, $states, $fromCookie)
     {
-        $allowLogin = true;
-
-        if ($this->hasEventHandler('onBeforeLogin')) {
-            $this->onBeforeLogin(new CEvent($this, [
-                'allowLogin' => &$allowLogin,
-                'id' => $id,
-                'states' => $states,
-                'fromCookie' => $fromCookie,
-            ]));
+        if (!$this->hasEventHandler('onBeforeLogin')) {
+            return true;
         }
 
-        return $allowLogin;
+        $event = new CEvent($this, [
+            'allowLogin' => true,
+            'id' => $id,
+            'states' => $states,
+            'fromCookie' => $fromCookie,
+        ]);
+        $this->onBeforeLogin($event);
+
+        return $event->params['allowLogin'];
     }
 
     /**
@@ -107,15 +124,17 @@ class WebUser extends CWebUser
      */
     protected function beforeLogout()
     {
-        $allowLogout = true;
-
-        if ($this->hasEventHandler('onBeforeLogout')) {
-            $this->onBeforeLogout(new CEvent($this, [
-                'allowLogout' => &$allowLogout,
-            ]));
+        if (!$this->hasEventHandler('onBeforeLogout')) {
+            return true;
         }
 
-        return $allowLogout;
+        $event = new CEvent($this, [
+            'allowLogout' => true,
+        ]);
+
+        $this->onBeforeLogout($event);
+
+        return $event->params['allowLogout'];
     }
 
     /**
