@@ -20,7 +20,7 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^6.0 || ^7.0 || ^8.0 || ^9.3 || ^10.0.7",
-        "yii1tech/session-dummy": "^1.0.0"
+        "yii1tech/session-dummy": "^1.0.1"
     },
     "autoload": {
         "psr-4": {

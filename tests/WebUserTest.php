@@ -144,6 +144,8 @@ class WebUserTest extends TestCase
             $event = $raisedEvent;
         };
 
+        Yii::app()->getComponent('session')->open();
+
         $_SESSION['__id'] = 'username';
         $_SESSION['__name'] = 'username';
 
