@@ -38,4 +38,99 @@ to the "require" section of your composer.json.
 Usage
 -----
 
-This extension
+This extension provides advanced version of the standard `CWebUser` component for Yii 1.
+Class `yii1tech\web\user\WebUser` adds ability for setup external handlers for the authentication flow events.
+Following events are available:
+
+- 'onAfterRestore' - raises after user data restoration from session, cookie and so on.
+- 'onBeforeLogin' - raises before user logs in.
+- 'onAfterLogin' - raises after user successfully logged in.
+- 'onBeforeLogout' - raises before user logs out.
+- 'onAfterLogout' - raises after user successfully logged out.
+
+Application configuration example:
+
+```php
+<?php
+
+return [
+    'components' => [
+        'user' => [
+            'class' => yii1tech\web\user\WebUser::class,
+            'onAfterLogin' => function (CEvent $raisedEvent) {
+                Yii::log('User login ID=' . $raisedEvent->sender->getId());
+            },
+        ],
+        // ...
+    ],
+    // ...
+];
+```
+
+The most notable of all introduced events is 'onAfterRestore'.
+By default, Yii does not re-check user's identity availability on each subsequent request. Once user logs in, he stays authenticated, even
+if related record at "users" table is deleted. You can use 'onAfterRestore' event to ensure deleted or banned users will lose access to your
+application right away. For example:
+
+```php
+<?php
+
+return [
+    'components' => [
+        'user' => [
+            'class' => yii1tech\web\user\WebUser::class,
+            'onAfterRestore' => function (CEvent $raisedEvent) {
+                $user = User::model()->findByPk($raisedEvent->sender->getId());
+                
+                if (empty($user) || $user->is_banned) {
+                    $raisedEvent->sender->logout(false);
+                }
+            },
+        ],
+        // ...
+    ],
+    // ...
+];
+```
+
+This package also provides `yii1tech\web\user\ActiveRecordModelBehavior` behavior for the `yii1tech\web\user\WebUser`, which allows
+operating ActiveRecord model at the WebUser component level.
+
+Application configuration example:
+
+```php
+<?php
+
+return [
+    'components' => [
+        'user' => [
+            'class' => yii1tech\web\user\WebUser::class,
+            'behaviors' => [
+                'modelBehavior' => [
+                    'class' => yii1tech\web\user\ActiveRecordModelBehavior::class,
+                    'modelClass' => app\models\User::class, // ActiveRecord class to used for model source
+                    'attributeToStateMap' => [ // map for WebUser states fill up
+                        'username' => '__name', // matches `Yii::app()->user->getName()`
+                        'email' => 'email', // matches `Yii::app()->user->getState('email')`
+                    ],
+                ],
+            ],
+        ],
+        // ...
+    ],
+    // ...
+];
+```
+
+Inside you program you can always access currently authenticated user's model via "user" application component.
+For example:
+
+```php
+<?php
+
+$user = Yii::app()->user->getModel();
+
+var_dump($user->id == Yii::app()->user->getId()); // outputs `true`
+var_dump($user->username == Yii::app()->user->getName()); // outputs `true`
+var_dump($user->email == Yii::app()->user->getState('email')); // outputs `true`
+```

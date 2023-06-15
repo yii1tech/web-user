@@ -6,7 +6,7 @@ use CBehavior;
 use CEvent;
 
 /**
- * ActiveRecordModelBehavior allows operating AcriveRecord model at the WebUser component level.
+ * ActiveRecordModelBehavior allows operating ActiveRecord model at the WebUser component level.
  *
  * Application configuration example:
  *
