@@ -15,6 +15,9 @@ use CWebUser;
  *     'components' => [
  *         'user' => [
  *             'class' => yii1tech\web\user\WebUser::class,
+ *             'onAfterLogin' => function (CEvent $event) {
+ *                 Yii::log('Login User ID=' . $event->sender->getId());
+ *             },
  *         ],
  *         // ...
  *     ],
